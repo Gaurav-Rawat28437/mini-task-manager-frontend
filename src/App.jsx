@@ -6,7 +6,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import Tasks from './pages/Tasks'
-
+import TaskDetails from "./pages/TaskDetails"
 
 
 function App() {
@@ -24,6 +24,7 @@ function App() {
                 <Route path="/" element={<Dashboard />}></Route>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/tasks" element={<Tasks />} />
+                <Route path="/tasks/:id" element={<TaskDetails />} />
                 
 
         </Route>

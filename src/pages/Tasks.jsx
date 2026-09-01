@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import toast from "react-hot-toast"
 
 import Navbar from "../components/Navbar"
+import DeleteConfirmModal from "../components/DeleteConfirmModal"
 
 import {
     getTasksApi,
@@ -32,11 +33,7 @@ function Tasks() {
 
     const [search, setSearch] = useState("")
     const [statusFilter, setStatusFilter] = useState("All")
-
-
-    // =========================
-    // FETCH TASKS
-    // =========================
+    const [deleteTaskId, setDeleteTaskId] = useState(null)
 
     useEffect(() => {
 
@@ -73,10 +70,6 @@ function Tasks() {
     }, [dispatch])
 
 
-    // =========================
-    // SEARCH + STATUS FILTER
-    // =========================
-
     const filteredTasks = tasks.filter(task => {
 
         const matchesSearch =
@@ -94,10 +87,6 @@ function Tasks() {
 
     })
 
-
-    // =========================
-    // DELETE TASK
-    // =========================
 
     const handleDelete = async (id) => {
 
@@ -135,11 +124,6 @@ function Tasks() {
 
     }
 
-
-    // =========================
-    // STATUS COLOR
-    // =========================
-
     const getStatusClass = (status) => {
 
         if (status === "Completed") {
@@ -159,9 +143,6 @@ function Tasks() {
     }
 
 
-    // =========================
-    // PRIORITY COLOR
-    // =========================
 
     const getPriorityClass = (priority) => {
 
@@ -192,9 +173,7 @@ function Tasks() {
             <main className="p-5 sm:p-8 max-w-[1200px] mx-auto">
 
 
-                {/* =========================
-                    HEADER
-                ========================= */}
+
 
                 <div className="
                     flex
@@ -249,9 +228,6 @@ function Tasks() {
                 </div>
 
 
-                {/* =========================
-                    SEARCH + FILTER
-                ========================= */}
 
                 {!loading && tasks.length > 0 && (
 
@@ -272,7 +248,7 @@ function Tasks() {
                         ">
 
 
-                            {/* SEARCH */}
+
 
                             <input
                                 type="text"
@@ -299,7 +275,6 @@ function Tasks() {
                             />
 
 
-                            {/* STATUS FILTER */}
 
                             <select
                                 value={statusFilter}
@@ -347,9 +322,7 @@ function Tasks() {
                 )}
 
 
-                {/* =========================
-                    LOADING
-                ========================= */}
+
 
                 {loading ? (
 
@@ -387,9 +360,6 @@ function Tasks() {
                 ) : tasks.length === 0 ? (
 
 
-                    /* =========================
-                       NO TASKS
-                    ========================= */
 
                     <div className="
                         bg-white
@@ -463,9 +433,6 @@ function Tasks() {
                 ) : filteredTasks.length === 0 ? (
 
 
-                    /* =========================
-                       NO SEARCH RESULTS
-                    ========================= */
 
                     <div className="
                         bg-white
@@ -540,11 +507,6 @@ function Tasks() {
 
 
                 ) : (
-
-
-                    /* =========================
-                       TASK LIST
-                    ========================= */
 
                     <div className="
                         grid
@@ -635,11 +597,7 @@ function Tasks() {
 
 
                                         <button
-                                            onClick={() =>
-                                                handleDelete(
-                                                    task._id
-                                                )
-                                            }
+                                            onClick={() => setDeleteTaskId(task._id)}
                                             disabled={
                                                 deleteLoading ===
                                                 task._id
@@ -659,7 +617,7 @@ function Tasks() {
                                         >
 
                                             {deleteLoading ===
-                                            task._id
+                                                task._id
                                                 ? "Deleting..."
                                                 : "Delete"}
 
@@ -669,8 +627,6 @@ function Tasks() {
 
                                 </div>
 
-
-                                {/* STATUS + PRIORITY */}
 
                                 <div className="
                                     flex
@@ -689,8 +645,8 @@ function Tasks() {
                                             text-xs
                                             font-semibold
                                             ${getStatusClass(
-                                                task.status
-                                            )}
+                                            task.status
+                                        )}
                                         `}
                                     >
                                         {task.status}
@@ -705,8 +661,8 @@ function Tasks() {
                                             text-xs
                                             font-semibold
                                             ${getPriorityClass(
-                                                task.priority
-                                            )}
+                                            task.priority
+                                        )}
                                         `}
                                     >
                                         {task.priority}
@@ -715,7 +671,7 @@ function Tasks() {
                                 </div>
 
 
-                                {/* DUE DATE */}
+
 
                                 {task.dueDate && (
 
@@ -758,9 +714,6 @@ function Tasks() {
                 )}
 
 
-                {/* =========================
-                    CREATE MODAL
-                ========================= */}
 
                 {showCreateModal && (
 
@@ -773,9 +726,6 @@ function Tasks() {
                 )}
 
 
-                {/* =========================
-                    EDIT MODAL
-                ========================= */}
 
                 {editTask && (
 
@@ -789,6 +739,17 @@ function Tasks() {
                 )}
 
             </main>
+
+            {deleteTaskId && (
+                <DeleteConfirmModal
+                    loading={deleteLoading === deleteTaskId}
+                    onCancel={() => setDeleteTaskId(null)}
+                    onConfirm={async () => {
+                        await handleDelete(deleteTaskId)
+                        setDeleteTaskId(null)
+                    }}
+                />
+            )}
 
         </div>
     )

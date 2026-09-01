@@ -129,7 +129,6 @@ function Dashboard() {
 
                     <div className="max-w-7xl mx-auto">
 
-                        {/* Header */}
 
                         <div className="mb-7">
 
@@ -144,11 +143,10 @@ function Dashboard() {
                         </div>
 
 
-                        {/* Statistics */}
-
+                     
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
-                            {/* Total */}
+                          
 
                             <div className="bg-white rounded-xl border border-[#DDE3EA] p-5 shadow-sm">
 
@@ -175,7 +173,7 @@ function Dashboard() {
                             </div>
 
 
-                            {/* Pending */}
+                        
 
                             <div className="bg-white rounded-xl border border-[#DDE3EA] p-5 shadow-sm">
 
@@ -202,8 +200,6 @@ function Dashboard() {
                             </div>
 
 
-                            {/* In Progress */}
-
                             <div className="bg-white rounded-xl border border-[#DDE3EA] p-5 shadow-sm">
 
                                 <div className="flex items-center justify-between">
@@ -229,7 +225,6 @@ function Dashboard() {
                             </div>
 
 
-                            {/* Completed */}
 
                             <div className="bg-white rounded-xl border border-[#DDE3EA] p-5 shadow-sm">
 
@@ -258,7 +253,7 @@ function Dashboard() {
                         </div>
 
 
-                        {/* Recent Tasks */}
+                       
 
                         <div className="mt-7 bg-white rounded-xl border border-[#DDE3EA] shadow-sm">
 
@@ -297,7 +292,6 @@ function Dashboard() {
                             </div>
 
 
-                            {/* Loading */}
 
                             {loading && (
 
@@ -323,7 +317,6 @@ function Dashboard() {
                             )}
 
 
-                            {/* Empty */}
 
                             {!loading && recentTasks.length === 0 && (
 
@@ -377,8 +370,6 @@ function Dashboard() {
                             )}
 
 
-                            {/* Tasks */}
-
                             {!loading && recentTasks.length > 0 && (
 
                                 <div className="divide-y divide-[#DDE3EA]">
@@ -386,6 +377,7 @@ function Dashboard() {
                                     {recentTasks.map(task => (
 
                                         <div
+                                            onClick={() => navigate(`/tasks/${task._id}`)}
                                             key={task._id}
                                             className="
                                                 p-5
