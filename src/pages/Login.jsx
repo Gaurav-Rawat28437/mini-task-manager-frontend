@@ -1,14 +1,16 @@
 import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useDispatch } from "react-redux"
 import toast from "react-hot-toast"
 
-import { registerApi } from "../services/authService"
+import { loginApi } from "../services/authService"
+import { addUserData } from "../utils/userSlice"
 
-function Register() {
+function Login() {
 
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
-    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
@@ -21,19 +23,22 @@ function Register() {
 
         try {
 
-            const response = await registerApi({
-                name,
+            const response = await loginApi({
                 email,
                 password
             })
 
-            toast.success(response.message)
+            if (response.success) {
 
-            setName("")
-            setEmail("")
-            setPassword("")
+                dispatch(addUserData(response.user))
 
-            navigate("/login")
+                toast.success(response.message)
+
+                setEmail("")
+                setPassword("")
+
+                navigate("/dashboard")
+            }
 
         } catch (error) {
 
@@ -67,36 +72,17 @@ function Register() {
                             </div>
 
                             <h1 className="text-[30px] sm:text-[34px] font-extrabold text-[#1F2937] mb-2">
-                                Create account
+                                Welcome back!
                             </h1>
 
                             <p className="text-sm text-[#6B7280] mb-7">
-                                Create your TaskFlow account
+                                Login to manage your tasks
                             </p>
 
                             <form
                                 onSubmit={submitHandler}
                                 className="text-left"
                             >
-
-                                <div className="mb-[17px]">
-
-                                    <label className="block text-[13px] font-semibold text-[#6B7280] mb-1.5">
-                                        Name
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        placeholder="Enter your name"
-                                        value={name}
-                                        onChange={(e) =>
-                                            setName(e.target.value)
-                                        }
-                                        required
-                                        className="w-full px-3.5 py-[13px] rounded-md border border-[#DDE3EA] outline-none text-sm text-[#1F2937] bg-white focus:border-[#0D0B61] focus:ring-4 focus:ring-[#0D0B61]/[0.08]"
-                                    />
-
-                                </div>
 
                                 <div className="mb-[17px]">
 
@@ -119,9 +105,20 @@ function Register() {
 
                                 <div className="mb-[17px]">
 
-                                    <label className="block text-[13px] font-semibold text-[#6B7280] mb-1.5">
-                                        Password
-                                    </label>
+                                    <div className="flex justify-between items-center mb-1.5">
+
+                                        <label className="text-[13px] font-semibold text-[#6B7280]">
+                                            Password
+                                        </label>
+
+                                        <button
+                                            type="button"
+                                            className="text-xs font-semibold text-[#478B8D] hover:text-[#0D0B61]"
+                                        >
+                                            Forgot password?
+                                        </button>
+
+                                    </div>
 
                                     <div className="relative">
 
@@ -137,7 +134,7 @@ function Register() {
                                                 setPassword(e.target.value)
                                             }
                                             required
-                                            className="w-full px-3.5 py-[13px] pr-20 rounded-md border border-[#DDE3EA] outline-none text-sm text-[#1F2937] bg-white focus:border-[#0D0B61] focus:ring-4 focus:ring-[#0D0B61]/[0.08]"
+                                            className="w-full px-3.5 py-[13px] pr-16 rounded-md border border-[#DDE3EA] outline-none text-sm text-[#1F2937] bg-white focus:border-[#0D0B61] focus:ring-4 focus:ring-[#0D0B61]/[0.08]"
                                         />
 
                                         <button
@@ -168,12 +165,14 @@ function Register() {
 
                                             <span className="w-[17px] h-[17px] border-2 border-white border-t-transparent rounded-full animate-spin" />
 
-                                            Creating account...
+                                            Logging in...
 
                                         </span>
 
                                     ) : (
-                                        "Create account"
+
+                                        "Log in"
+
                                     )}
 
                                 </button>
@@ -182,13 +181,13 @@ function Register() {
 
                             <p className="text-sm text-[#6B7280] mt-6">
 
-                                Already have an account?{" "}
+                                Don't have an account?{" "}
 
                                 <Link
-                                    to="/login"
+                                    to="/register"
                                     className="font-semibold text-[#478B8D] hover:text-[#0D0B61]"
                                 >
-                                    Login
+                                    Register
                                 </Link>
 
                             </p>
@@ -212,20 +211,20 @@ function Register() {
                         </span>
 
                         <h2 className="text-[34px] leading-[1.15] font-extrabold mb-4">
-                            Start managing your tasks today.
+                            Organize your work in one place.
                         </h2>
 
                         <p className="text-[15px] leading-[1.7] text-white/75 mb-7">
-                            Keep your tasks organized, manage priorities,
-                            and track your progress from one clean dashboard.
+                            Create tasks, manage priorities, and track your
+                            daily progress using one clean dashboard.
                         </p>
 
                         <div className="flex flex-col gap-4">
 
                             {[
                                 "Create and manage tasks",
-                                "Set task priorities",
-                                "Track task progress"
+                                "Track task progress",
+                                "Manage your daily workflow"
                             ].map((text, index) => (
 
                                 <div
@@ -269,4 +268,4 @@ function Register() {
     )
 }
 
-export default Register
+export default Login
