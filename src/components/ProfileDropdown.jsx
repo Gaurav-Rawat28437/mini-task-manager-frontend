@@ -1,14 +1,11 @@
 import React from "react"
-import { useNavigate } from "react-router-dom"
 import {
     User,
     Settings,
     LogOut
 } from "lucide-react"
 
-function ProfileDropdown({ userData, onLogout }) {
-
-    const navigate = useNavigate()
+function ProfileDropdown({ userData, onLogout, onProfile }) {
 
     return (
         <div className="absolute right-0 top-12 w-64 bg-white border border-[#DDE3EA] rounded-xl shadow-[0_10px_30px_rgba(15,23,42,0.12)] p-2 z-50">
@@ -40,8 +37,9 @@ function ProfileDropdown({ userData, onLogout }) {
 
             </div>
 
+            {/* Profile */}
             <button
-                onClick={() => navigate("/profile")}
+                onClick={onProfile}
                 className="
                     w-full
                     flex
@@ -61,8 +59,8 @@ function ProfileDropdown({ userData, onLogout }) {
                 Profile
             </button>
 
+            {/* Settings */}
             <button
-                onClick={() => navigate("/settings")}
                 className="
                     w-full
                     flex
@@ -84,6 +82,7 @@ function ProfileDropdown({ userData, onLogout }) {
 
             <div className="my-1 border-t border-[#E5E7EB]" />
 
+            {/* Logout */}
             <button
                 onClick={onLogout}
                 className="

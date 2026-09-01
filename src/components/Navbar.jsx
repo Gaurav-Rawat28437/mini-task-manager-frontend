@@ -7,6 +7,7 @@ import { Menu } from "lucide-react"
 import { logoutApi } from "../services/authService"
 import { removeUserData } from "../utils/userSlice"
 import ProfileDropdown from "./ProfileDropdown"
+import ProfileModal from "./ProfileModal"
 
 function Navbar() {
 
@@ -18,6 +19,7 @@ function Navbar() {
     const navigate = useNavigate()
 
     const [showProfile, setShowProfile] = useState(false)
+    const [showProfileModal, setShowProfileModal] = useState(false)
 
     const logoutHandler = async () => {
 
@@ -123,10 +125,21 @@ function Navbar() {
                     <ProfileDropdown
                         userData={userData}
                         onLogout={logoutHandler}
+                        onProfile={() => {
+                            setShowProfile(false)
+                            setShowProfileModal(true)
+                        }}
                     />
                 )}
 
             </div>
+
+            {showProfileModal && (
+                <ProfileModal
+                    userData={userData}
+                    onClose={() => setShowProfileModal(false)}
+                />
+            )}
 
         </header>
     )
