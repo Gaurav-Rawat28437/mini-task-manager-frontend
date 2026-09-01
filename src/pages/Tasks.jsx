@@ -21,7 +21,6 @@ import {
 } from "../utils/taskSlice"
 
 function Tasks() {
-
     const dispatch = useDispatch()
 
     const tasks = useSelector(
@@ -30,6 +29,7 @@ function Tasks() {
 
     const [loading, setLoading] = useState(true)
     const [deleteLoading, setDeleteLoading] = useState(null)
+
     const [showCreateModal, setShowCreateModal] = useState(false)
     const [editTask, setEditTask] = useState(null)
     const [deleteTaskId, setDeleteTaskId] = useState(null)
@@ -44,18 +44,17 @@ function Tasks() {
     const [hasPreviousPage, setHasPreviousPage] = useState(false)
 
     useEffect(() => {
-
         const getTasks = async () => {
-
             try {
-
                 setLoading(true)
 
-                const response =
-                    await getTasksApi(page, 5, sort)
+                const response = await getTasksApi(
+                    page,
+                    5,
+                    sort
+                )
 
                 if (response.success) {
-
                     dispatch(
                         setTasks(response.tasks || [])
                     )
@@ -72,27 +71,20 @@ function Tasks() {
                         response.pagination?.hasPreviousPage || false
                     )
                 }
-
             } catch (error) {
-
                 toast.error(
                     error.response?.data?.message ||
                     "Failed to fetch tasks"
                 )
-
             } finally {
-
                 setLoading(false)
-
             }
         }
 
         getTasks()
-
     }, [dispatch, page, sort])
 
     const filteredTasks = tasks.filter(task => {
-
         const matchesSearch =
             task.title
                 ?.toLowerCase()
@@ -105,40 +97,28 @@ function Tasks() {
         return matchesSearch && matchesStatus
     })
 
-    const handleDelete = async (id) => {
-
+    const handleDelete = async id => {
         try {
-
             setDeleteLoading(id)
 
-            const response =
-                await deleteTaskApi(id)
+            const response = await deleteTaskApi(id)
 
             if (response.success) {
-
                 dispatch(deleteTask(id))
 
                 toast.success(response.message)
 
-                if (
-                    tasks.length === 1 &&
-                    page > 1
-                ) {
+                if (tasks.length === 1 && page > 1) {
                     setPage(prev => prev - 1)
                 }
             }
-
         } catch (error) {
-
             toast.error(
                 error.response?.data?.message ||
                 "Failed to delete task"
             )
-
         } finally {
-
             setDeleteLoading(null)
-
         }
     }
 
@@ -163,9 +143,7 @@ function Tasks() {
                     gap-4
                     mb-7
                 ">
-
                     <div>
-
                         <h1 className="
                             text-2xl
                             font-extrabold
@@ -181,7 +159,6 @@ function Tasks() {
                         ">
                             Manage and track all your tasks.
                         </p>
-
                     </div>
 
                     <button
@@ -201,7 +178,6 @@ function Tasks() {
                     >
                         + Create Task
                     </button>
-
                 </div>
 
                 {!loading && tasks.length > 0 && (
@@ -225,7 +201,6 @@ function Tasks() {
                         p-12
                         text-center
                     ">
-
                         <div className="
                             w-8
                             h-8
@@ -235,7 +210,7 @@ function Tasks() {
                             border-t-[#0D0B61]
                             rounded-full
                             animate-spin
-                        />
+                        " />
 
                         <p className="
                             text-sm
@@ -244,7 +219,6 @@ function Tasks() {
                         ">
                             Loading tasks...
                         </p>
-
                     </div>
                 )}
 
@@ -289,7 +263,7 @@ function Tasks() {
                         </div>
                     )}
 
-                {!loading && (
+                {!loading && totalPages > 1 && (
                     <TaskPagination
                         page={page}
                         totalPages={totalPages}
