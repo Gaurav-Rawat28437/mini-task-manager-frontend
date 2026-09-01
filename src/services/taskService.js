@@ -2,10 +2,16 @@ import axios from "axios"
 
 const API_URL = import.meta.env.VITE_API_URL
 
-export const getTasksApi = async () => {
+export const getTasksApi = async (page = 1, limit = 5, sort = "") => {
+
     const response = await axios.get(
         `${API_URL}/tasks`,
         {
+            params: {
+                page,
+                limit,
+                sort
+            },
             withCredentials: true
         }
     )

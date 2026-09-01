@@ -33,22 +33,44 @@ function Tasks() {
 
     const [search, setSearch] = useState("")
     const [statusFilter, setStatusFilter] = useState("All")
-    const [deleteTaskId, setDeleteTaskId] = useState(null)
 
+    const [deleteTaskId, setDeleteTaskId] = useState(null)
+    const [sort, setSort] = useState("newest")
+
+    
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+    const [hasNextPage, setHasNextPage] = useState(false)
+    const [hasPreviousPage, setHasPreviousPage] = useState(false)
+
+    
     useEffect(() => {
 
         const getTasks = async () => {
 
             try {
 
-                const response = await getTasksApi()
+                setLoading(true)
+
+                const response = await getTasksApi(page, 5, sort)
 
                 if (response.success) {
 
                     dispatch(
-                        setTasks(response.tasks)
+                        setTasks(response.tasks || [])
                     )
 
+                    setTotalPages(
+                        response.pagination?.totalPages || 1
+                    )
+
+                    setHasNextPage(
+                        response.pagination?.hasNextPage || false
+                    )
+
+                    setHasPreviousPage(
+                        response.pagination?.hasPreviousPage || false
+                    )
                 }
 
             } catch (error) {
@@ -67,9 +89,10 @@ function Tasks() {
 
         getTasks()
 
-    }, [dispatch])
+    }, [dispatch, page,sort])
 
 
+   
     const filteredTasks = tasks.filter(task => {
 
         const matchesSearch =
@@ -88,6 +111,9 @@ function Tasks() {
     })
 
 
+    /*
+        Delete task
+    */
     const handleDelete = async (id) => {
 
         try {
@@ -107,6 +133,18 @@ function Tasks() {
                     response.message
                 )
 
+                /*
+                    If current page becomes empty
+                    after deleting the last task,
+                    move to previous page.
+                */
+                if (
+                    tasks.length === 1 &&
+                    page > 1
+                ) {
+                    setPage(prev => prev - 1)
+                }
+
             }
 
         } catch (error) {
@@ -124,18 +162,18 @@ function Tasks() {
 
     }
 
+
+    /*
+        Status badge classes
+    */
     const getStatusClass = (status) => {
 
         if (status === "Completed") {
-
             return "bg-green-100 text-green-700"
-
         }
 
         if (status === "In Progress") {
-
             return "bg-blue-100 text-blue-700"
-
         }
 
         return "bg-yellow-100 text-yellow-700"
@@ -143,19 +181,17 @@ function Tasks() {
     }
 
 
-
+    /*
+        Priority badge classes
+    */
     const getPriorityClass = (priority) => {
 
         if (priority === "High") {
-
             return "bg-red-100 text-red-700"
-
         }
 
         if (priority === "Medium") {
-
             return "bg-orange-100 text-orange-700"
-
         }
 
         return "bg-green-100 text-green-700"
@@ -169,11 +205,10 @@ function Tasks() {
 
             <Navbar />
 
-
             <main className="p-5 sm:p-8 max-w-[1200px] mx-auto">
 
 
-
+                {/* Header */}
 
                 <div className="
                     flex
@@ -228,6 +263,7 @@ function Tasks() {
                 </div>
 
 
+                {/* Search + Filter */}
 
                 {!loading && tasks.length > 0 && (
 
@@ -248,7 +284,7 @@ function Tasks() {
                         ">
 
 
-
+                            {/* Search */}
 
                             <input
                                 type="text"
@@ -275,6 +311,52 @@ function Tasks() {
                             />
 
 
+                            <select
+    value={sort}
+    onChange={(e) => {
+        setSort(e.target.value)
+        setPage(1)
+    }}
+    className="
+        sm:w-[200px]
+        px-4
+        py-2.5
+        rounded-lg
+        border
+        border-[#DDE3EA]
+        outline-none
+        text-sm
+        bg-white
+        focus:border-[#0D0B61]
+    "
+>
+    <option value="newest">
+        Newest First
+    </option>
+
+    <option value="oldest">
+        Oldest First
+    </option>
+
+    <option value="priorityHigh">
+        Priority: High → Low
+    </option>
+
+    <option value="priorityLow">
+        Priority: Low → High
+    </option>
+
+    <option value="dueDateSoon">
+        Due Date: Earliest
+    </option>
+
+    <option value="dueDateLate">
+        Due Date: Latest
+    </option>
+</select>
+
+
+                            {/* Status Filter */}
 
                             <select
                                 value={statusFilter}
@@ -322,7 +404,7 @@ function Tasks() {
                 )}
 
 
-
+                {/* Loading */}
 
                 {loading ? (
 
@@ -360,6 +442,7 @@ function Tasks() {
                 ) : tasks.length === 0 ? (
 
 
+                    /* No tasks */
 
                     <div className="
                         bg-white
@@ -433,6 +516,7 @@ function Tasks() {
                 ) : filteredTasks.length === 0 ? (
 
 
+                    /* No matching tasks */
 
                     <div className="
                         bg-white
@@ -508,6 +592,9 @@ function Tasks() {
 
                 ) : (
 
+
+                    /* Task Cards */
+
                     <div className="
                         grid
                         grid-cols-1
@@ -530,7 +617,7 @@ function Tasks() {
                             >
 
 
-                                {/* TASK HEADER */}
+                                {/* Title + Actions */}
 
                                 <div className="
                                     flex
@@ -540,9 +627,7 @@ function Tasks() {
                                 ">
 
 
-                                    <div className="
-                                        min-w-0
-                                    ">
+                                    <div className="min-w-0">
 
                                         <h2 className="
                                             text-lg
@@ -567,14 +652,14 @@ function Tasks() {
                                     </div>
 
 
-                                    {/* ACTION BUTTONS */}
-
                                     <div className="
                                         flex
                                         gap-2
                                         shrink-0
                                     ">
 
+
+                                        {/* Edit */}
 
                                         <button
                                             onClick={() =>
@@ -596,8 +681,14 @@ function Tasks() {
                                         </button>
 
 
+                                        {/* Delete */}
+
                                         <button
-                                            onClick={() => setDeleteTaskId(task._id)}
+                                            onClick={() =>
+                                                setDeleteTaskId(
+                                                    task._id
+                                                )
+                                            }
                                             disabled={
                                                 deleteLoading ===
                                                 task._id
@@ -628,6 +719,8 @@ function Tasks() {
                                 </div>
 
 
+                                {/* Status + Priority */}
+
                                 <div className="
                                     flex
                                     flex-wrap
@@ -645,8 +738,8 @@ function Tasks() {
                                             text-xs
                                             font-semibold
                                             ${getStatusClass(
-                                            task.status
-                                        )}
+                                                task.status
+                                            )}
                                         `}
                                     >
                                         {task.status}
@@ -661,8 +754,8 @@ function Tasks() {
                                             text-xs
                                             font-semibold
                                             ${getPriorityClass(
-                                            task.priority
-                                        )}
+                                                task.priority
+                                            )}
                                         `}
                                     >
                                         {task.priority}
@@ -671,7 +764,7 @@ function Tasks() {
                                 </div>
 
 
-
+                                {/* Due Date */}
 
                                 {task.dueDate && (
 
@@ -714,6 +807,78 @@ function Tasks() {
                 )}
 
 
+                {/* Pagination */}
+
+                {!loading && totalPages > 1 && (
+
+                    <div className="
+                        mt-7
+                        flex
+                        items-center
+                        justify-center
+                        gap-4
+                    ">
+
+                        <button
+                            onClick={() =>
+                                setPage(prev => prev - 1)
+                            }
+                            disabled={!hasPreviousPage}
+                            className="
+                                px-4
+                                py-2
+                                rounded-md
+                                border
+                                border-[#DDE3EA]
+                                bg-white
+                                text-sm
+                                font-semibold
+                                text-[#374151]
+                                hover:bg-[#F5F6FA]
+                                disabled:opacity-40
+                                disabled:cursor-not-allowed
+                            "
+                        >
+                            Previous
+                        </button>
+
+
+                        <span className="
+                            text-sm
+                            font-semibold
+                            text-[#374151]
+                        ">
+                            Page {page} of {totalPages}
+                        </span>
+
+
+                        <button
+                            onClick={() =>
+                                setPage(prev => prev + 1)
+                            }
+                            disabled={!hasNextPage}
+                            className="
+                                px-4
+                                py-2
+                                rounded-md
+                                bg-[#0D0B61]
+                                text-white
+                                text-sm
+                                font-semibold
+                                hover:bg-[#100d7a]
+                                disabled:opacity-40
+                                disabled:cursor-not-allowed
+                            "
+                        >
+                            Next
+                        </button>
+
+                    </div>
+
+                )}
+
+
+                {/* Create Task Modal */}
 
                 {showCreateModal && (
 
@@ -726,6 +891,7 @@ function Tasks() {
                 )}
 
 
+                {/* Edit Task Modal */}
 
                 {editTask && (
 
@@ -740,15 +906,33 @@ function Tasks() {
 
             </main>
 
+
+            {/* Delete Confirmation Modal */}
+
             {deleteTaskId && (
+
                 <DeleteConfirmModal
-                    loading={deleteLoading === deleteTaskId}
-                    onCancel={() => setDeleteTaskId(null)}
-                    onConfirm={async () => {
-                        await handleDelete(deleteTaskId)
+
+                    loading={
+                        deleteLoading === deleteTaskId
+                    }
+
+                    onCancel={() =>
                         setDeleteTaskId(null)
+                    }
+
+                    onConfirm={async () => {
+
+                        await handleDelete(
+                            deleteTaskId
+                        )
+
+                        setDeleteTaskId(null)
+
                     }}
+
                 />
+
             )}
 
         </div>
